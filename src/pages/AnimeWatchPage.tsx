@@ -1402,7 +1402,7 @@ const AnimeWatch: React.FC = () => {
   const prevProxifiedUrlRef = useRef<string | null>(null);
 
   const [isSpeeding, setIsSpeeding] = useState(false);
-  const [useYouTubeStylePlayer] = useState(() => localStorage.getItem('watchNetflixPlayer') === 'true' || localStorage.getItem('watchNetflixPlayer') === 'false');
+  const [useYouTubeStylePlayer] = useState(() => localStorage.getItem('watchNetflixPlayer') !== 'false');
   const [ytControlsVisible, setYtControlsVisible] = useState(true);
   const [ytHideTimeout, setYtHideTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
   const [ytIsMuted, setYtIsMuted] = useState(false);
