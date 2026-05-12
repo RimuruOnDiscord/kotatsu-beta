@@ -175,6 +175,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = useCallback(async (email: string, password: string, displayName: string, inviteCode: string) => {
     if (!inviteCode.trim()) return { error: 'Invite code is required' };
 
+    // Pre-validate the invite code before creating the auth account.
+    // This catches invalid/used/expired codes even when email confirmation
+    // is enabled (where there is no session to redeem against at signup time).
+    const { data: codeValid, error: codeCheckError } = await supabase.rpc(
+      'verify_invite_code_valid',
+      { p_code: inviteCode.trim() }
+    );
+    if (codeCheckError || !codeValid) {
+      return { error: 'Invalid invite code' };
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -200,7 +211,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: null };
     }
 
-    return { error: signInError?.message ?? 'Account created. Please confirm your email, then sign in to redeem access.' };
+    return { error: signInError?.message ?? 'Account created. Please confirm your email, then sign in to redeem your invite code.' };
   }, [redeemSignedInUser]);
 
   const redeemInviteCode = useCallback(async (inviteCode: string) => {
